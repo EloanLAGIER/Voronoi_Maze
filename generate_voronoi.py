@@ -208,9 +208,8 @@ def BowyerWatson(taille,lp):
 
 
 #genere une liste de voronoi prenant en paramètre la taille et le nombre de point
-V=generate_voronoi(500,100)
-print("la premiere cellule a ",len(V[0])," points")
-print("il est représenté par :",V[0])
+ListV=generate_voronoi(500,100)
+
 
 
 
