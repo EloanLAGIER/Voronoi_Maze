@@ -30,7 +30,6 @@ def generate_voronoi(taille,n):
 
     #generation des points aleatoire (encore trÃ¨s simple )
     ListPoint=random_point(30,100)
-
     #fonction renvoyant les triangles de la triangulation des points
     listTri=BowyerWatson(taille,ListPoint)
 
@@ -83,7 +82,7 @@ class Triangle :
         self.p2=point2
         self.p3=point3
 
-        self.listVorV={}
+        self.listVorV=[]
         #les trois segments du triangle seg1,seg2,seg3
         self.seg1=trier_edge(self.p1[0],self.p1[1],self.p2[0],self.p2[1])
         self.seg2=trier_edge(self.p2[0],self.p2[1],self.p3[0],self.p3[1])
@@ -107,7 +106,7 @@ class Triangle :
 
     def voro_vois(self,v):
         if not(v in self.listVorV):
-            listVorV[v].append(v)
+            self.listVorV.append(v)
 
     #fonction qui pour un point p regarde si il est dans le cercle Circoncis
     def est_dans_cercle(self,p):
@@ -140,16 +139,19 @@ class Vor :
 
         self.centre=centre
         self.nb_cote=nb_cote
-
+        self.c=-1
         self.l_points=[]
         self.l_cote=[]
-        self.l_celluleOpp=[]
+        self.l_vois=[]
 
     def add_vert(self,c):
         self.l_points.append(c)
     def add_vois(self,v):
-        self.l_celluleOpp.append(v)
-        
+        if not(v in self.l_vois):
+            self.l_vois.append(v)
+
+
+         
 #fonction qui créé le voronoi sa complexité est de O^3 c'est affreux
 def voronoi(lp, lt):
     ListVor=[]
@@ -163,8 +165,11 @@ def voronoi(lp, lt):
 
             if t.a_le_point(p):
                 L.append(t)
+        LT=L[::]
         V=Vor(p,len(L))
-        if len(L)==3:
+        if len(L)==2:
+           a="nothing" 
+        elif len(L)==3:
             V.add_vert(L[0].centre)
             V.add_vert(L[1].centre)
             V.add_vert(L[2].centre)
@@ -192,9 +197,30 @@ def voronoi(lp, lt):
                     while (r==L.index(t_act)):
                         r=randint(0,len(L)-1)
                     t_suiv=L[r]
+        for i in range(len(LT)-1):
+            LT[i].voro_vois(V)
 
-        
         ListVor.append(V)
+
+    for t in lt:
+        if len(t.listVorV)==2:
+            v1=t.listVorV[0]
+            v2=t.listVorV[1]
+            v1.add_vois(v2)
+            v2.add_vois(v1)
+        if len(t.listVorV)==3:
+            v1=t.listVorV[0]
+            v2=t.listVorV[1]
+            v3=t.listVorV[2]
+            v1.add_vois(v2)
+            v1.add_vois(v3)
+            v2.add_vois(v1)
+            v2.add_vois(v3)
+            v3.add_vois(v2)
+            v3.add_vois(v1)
+    for v in ListVor:
+        if len(v.l_vois)!=v.nb_cote:
+            v.c=1
     return ListVor
 
 
@@ -241,9 +267,23 @@ def BowyerWatson(taille,lp):
     return triangulation
 
 
+def coloriser(lv):
+    DicVor={}
+    for v in lv:
+        DicVor[v] = v.l_vois
 
+    for v in DicVor.keys():
+
+        if v.c==-1:
+            v.c=0
+            for vo in DicVor[v]:
+                vo.c=1
+
+
+    return lv
 #genere une liste de voronoi prenant en paramÃ¨tre la taille et le nombre de point
 ListV=generate_voronoi(500,100)
+
 print(len(ListV))
 print("good")
 

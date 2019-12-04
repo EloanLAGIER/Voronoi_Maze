@@ -13,6 +13,9 @@ for j in range(len(ListV)):
     L=re.findall(r"[\w.-]+", cmds.polyInfo("V"+str(j), faceNormals=True)[0])
     if "-" in L[3]:
         cmds.polyNormal(name='V'+str(j)+'.f[0]',userNormalMode=1)
+    if ListV[j].c==0:
+        cmds.select('V'+str(j))
+        cmds.move(0.0,-100,0.0)
         
 
 
