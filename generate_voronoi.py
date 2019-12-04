@@ -1,27 +1,42 @@
 from random import *
 from math import *
 from copy import *
-##from tkinter import *
+import itertools
+
+
+def random_point(distance,nb_points):
+    candidates = list(itertools.product(range(500), range(500)))
+    points = []
+    for i in range(nb_points):
+
+        if not len(candidates):
+            break
+        point = x, y = choice(candidates)
+        points.append([point[0],point[1]])
+
+        candidates = [
+            (xx, yy) 
+            for xx, yy in candidates 
+            if ((x - xx) ** 2 + (y - yy) ** 2) ** .5 > distance
+        ]
+    return points
 
 #fonction principale( taille = dimension du carré général et n nombre de cellules de voronoi )
 def generate_voronoi(taille,n):
     
-    listPoint=[] #liste dans laquelle va y avoir tout les points
+
     
     centieme=taille/100#calcul du centieme de la taille pour pas que yest des points pil sur les bords
 
     #generation des points aleatoire (encore très simple )
-    for i in range(n):
-        x= randint(centieme,taille-(centieme))
-        y= randint(centieme,taille-(centieme))
-        listPoint.append([x,y])
+    ListPoint=random_point(50,100)
 
     #fonction renvoyant les triangles de la triangulation des points
-    listTri=BowyerWatson(taille,listPoint)
+    listTri=BowyerWatson(taille,ListPoint)
 
     #fonction renvoyant les cellules de voronoi
-    lVor=voronoi(listPoint,listTri)
-    print(listPoint)
+    lVor=voronoi(ListPoint,listTri)
+
     return lVor
 
 #fonction pas faite par moi calculant si deux lignes se croisent c'etait fait a la rache sur un forum on peut se l'aproprier
@@ -209,26 +224,7 @@ def BowyerWatson(taille,lp):
 
 #genere une liste de voronoi prenant en paramètre la taille et le nombre de point
 ListV=generate_voronoi(500,100)
+print(len(ListV))
+print("good")
 
 
-
-
-##si vous voulez representer avec tkinter
-##fenetre =Tk()
-##canvas = Canvas(fenetre,width=500, height=500, backgroun='grey')
-##
-##
-##for v in range(len(V)):
-##    for i in range(len(V[v])-1):
-##
-##        canvas.create_line(*V[v][i],*V[v][i+1])
-##    canvas.create_line(*V[v][len(V[v])-1],*V[v][0])
-##for v in range(len(V)):
-##    if vp.count(v)==1:
-##        print(v)
-##        print("ok")
-##        for i in range(len(V[v])-1):
-##            canvas.create_line(*V[v][i],*V[v][i+1],fill="red")
-##        canvas.create_line(*V[v][len(V[v])-1],*V[v][0],fill="red")
-##canvas.pack()
-##fenetre.mainloop()
