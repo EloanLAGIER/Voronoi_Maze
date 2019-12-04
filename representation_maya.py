@@ -8,8 +8,11 @@ for j in range(len(ListV)):
 
         cmds.select('V'+str(j)+'.vtx['+str(i)+']')
 
-        cmds.move(pos[0]-ListV[j][i][0],0.0,pos[2]-ListV[j][i][1])
+        cmds.move(pos[0]-pos[0]-ListV[j][i][0],0.0,pos[2]-pos[2]-ListV[j][i][1])
     L=re.findall(r"[\w.-]+", cmds.polyInfo("V"+str(j), faceNormals=True)[0])
     if "-" in L[3]:
         cmds.polyNormal(name='V'+str(j)+'.f[0]',userNormalMode=1)
+        
+
+
         

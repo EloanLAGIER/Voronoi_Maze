@@ -131,7 +131,7 @@ def trier_edge(x1,y1,x2,y2):
     else:
         return [[x2,y2],[x1,y1]]
 
-#fonction qui crÃ©e le voronoi Ã§a complexitÃ© et de O^3 c'est affreux
+#fonction qui créé le voronoi sa complexité est de O^3 c'est affreux
 def voronoi(lp, lt):
     ListVor=[]
     incr=0
