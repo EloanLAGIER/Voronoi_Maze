@@ -21,15 +21,15 @@ def random_point(distance,nb_points):
         ]
     return points
 
-#fonction principale( taille = dimension du carré général et n nombre de cellules de voronoi )
+#fonction principale( taille = dimension du carrÃ© gÃ©nÃ©ral et n nombre de cellules de voronoi )
 def generate_voronoi(taille,n):
     
 
     
     centieme=taille/100#calcul du centieme de la taille pour pas que yest des points pil sur les bords
 
-    #generation des points aleatoire (encore très simple )
-    ListPoint=random_point(50,100)
+    #generation des points aleatoire (encore trÃ¨s simple )
+    ListPoint=random_point(30,100)
 
     #fonction renvoyant les triangles de la triangulation des points
     listTri=BowyerWatson(taille,ListPoint)
@@ -65,7 +65,7 @@ def mediane(p1,p2):
     y2=p2[1]
     div=y1-y2
 
-    #genre ça c'est de la triche, euler se suicide
+    #genre Ã§a c'est de la triche, euler se suicide
     if div==0:
         div=0.1
     mil=[(p1[0]+p2[0])/2,(p1[1]+p2[1])/2]
@@ -75,7 +75,7 @@ def mediane(p1,p2):
 #instancede l'objet triangle qui va beaucoup servir
 class Triangle :
 
-    #ça c'est la fonction qui s'active quand on créer une instance
+    #Ã§a c'est la fonction qui s'active quand on crÃ©er une instance
     def __init__(self,point1,point2,point3):
 
         #les trois points du triangle p1,p2,p3
@@ -83,6 +83,7 @@ class Triangle :
         self.p2=point2
         self.p3=point3
 
+        self.listVorV={}
         #les trois segments du triangle seg1,seg2,seg3
         self.seg1=trier_edge(self.p1[0],self.p1[1],self.p2[0],self.p2[1])
         self.seg2=trier_edge(self.p2[0],self.p2[1],self.p3[0],self.p3[1])
@@ -104,6 +105,9 @@ class Triangle :
         #rayon du cercle Circoncis
         self.rayon=sqrt(pow((self.centre[0]-self.p1[0]),2)+pow((self.centre[1]-self.p1[1]),2))
 
+    def voro_vois(self,v):
+        if not(v in self.listVorV):
+            listVorV[v].append(v)
 
     #fonction qui pour un point p regarde si il est dans le cercle Circoncis
     def est_dans_cercle(self,p):
@@ -113,7 +117,7 @@ class Triangle :
     def a_le_point(self,p):
         return self.p1==p or self.p2==p or self.p3==p
 
-    #fonction qui regarde si un triangle t a un coté commun
+    #fonction qui regarde si un triangle t a un cotÃ© commun
     def cote_commun(self,t):
         return (t.seg1==self.seg1)or(t.seg1==self.seg2)or(t.seg1==self.seg3)or(t.seg2==self.seg1)or(t.seg2==self.seg2)or(t.seg2==self.seg3)or(t.seg3==self.seg1)or(t.seg3==self.seg2)or(t.seg3==self.seg3)
 
@@ -122,7 +126,7 @@ class Triangle :
         return (t.p1==self.p1)or(t.p1==self.p2)or(t.p1==self.p3)or(t.p2==self.p1)or(t.p2==self.p3)or(t.p2==self.p3)or(t.p3==self.p1)or(t.p3==self.p2)or(t.seg3==self.p3)
 
 #en faite quand on compare les segments des fois c'est les meme mais dans l'autre sens alors le programme comprend pas
-#du coup j'ai crée une fonction qui tri toujours les sgmens dans le meme sens voila voila
+#du coup j'ai crÃ©e une fonction qui tri toujours les sgmens dans le meme sens voila voila
 def trier_edge(x1,y1,x2,y2):
     calc1=x1*500+y1
     calc2=x2*500+y2
@@ -131,7 +135,22 @@ def trier_edge(x1,y1,x2,y2):
     else:
         return [[x2,y2],[x1,y1]]
 
-#fonction qui cr�� le voronoi sa complexit� est de O^3 c'est affreux
+class Vor :
+    def __init__(self,centre,nb_cote):
+
+        self.centre=centre
+        self.nb_cote=nb_cote
+
+        self.l_points=[]
+        self.l_cote=[]
+        self.l_celluleOpp=[]
+
+    def add_vert(self,c):
+        self.l_points.append(c)
+    def add_vois(self,v):
+        self.l_celluleOpp.append(v)
+        
+#fonction qui créé le voronoi sa complexité est de O^3 c'est affreux
 def voronoi(lp, lt):
     ListVor=[]
     incr=0
@@ -139,19 +158,20 @@ def voronoi(lp, lt):
     for p in lp:
         incr+=1
         L=[]
-        V=[]
+
         for t in lt:
 
             if t.a_le_point(p):
                 L.append(t)
+        V=Vor(p,len(L))
         if len(L)==3:
-            V.append(L[0].centre)
-            V.append(L[1].centre)
-            V.append(L[2].centre)
+            V.add_vert(L[0].centre)
+            V.add_vert(L[1].centre)
+            V.add_vert(L[2].centre)
         else:
             t_act=L[0]
             t_suiv=L[1]
-            V.append([round(t_act.centre[0]),round(t_act.centre[1])])
+            V.add_vert(t_act.centre)
             for i in range(len(L)-1):
                 count=0
                 while (not(t_suiv.cote_commun(t_act))) and count<100:
@@ -164,7 +184,7 @@ def voronoi(lp, lt):
                     t_suiv=L[r]
                 if count==100:
                     lpb.append(incr)
-                V.append([round(t_suiv.centre[0]),round(t_suiv.centre[1])])
+                V.add_vert(t_suiv.centre)
                 L.pop(L.index(t_act))
                 t_act=t_suiv
                 if len(L)>1:
@@ -173,12 +193,12 @@ def voronoi(lp, lt):
                         r=randint(0,len(L)-1)
                     t_suiv=L[r]
 
-
+        
         ListVor.append(V)
     return ListVor
 
 
-#la triangulation a une complexité de O^2 mais askip on peut la faire en O*ln(0)
+#la triangulation a une complexitÃ© de O^2 mais askip on peut la faire en O*ln(0)
 #faut la nettoyer et cheker comment les cas particuliers possible
 def BowyerWatson(taille,lp):
     triangulation=[]
@@ -222,7 +242,7 @@ def BowyerWatson(taille,lp):
 
 
 
-#genere une liste de voronoi prenant en paramètre la taille et le nombre de point
+#genere une liste de voronoi prenant en paramÃ¨tre la taille et le nombre de point
 ListV=generate_voronoi(500,100)
 print(len(ListV))
 print("good")
