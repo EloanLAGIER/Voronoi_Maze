@@ -2,7 +2,7 @@ from random import *
 from math import *
 from copy import *
 import itertools
-
+#sdkfjsldjghskdj
 
 def random_point(distance,nb_points):
     candidates = list(itertools.product(range(500), range(500)))
