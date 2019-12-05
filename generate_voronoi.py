@@ -208,6 +208,7 @@ class Vor :
         self.l_mur=[]
         self.l_vois=[]
         self.l_mv=[]
+        self.visit=0
     def add_vert(self,c):
         self.l_points.append(c)
     def add_vois(self,v):
@@ -363,9 +364,17 @@ def coloriser(lv):
                 v.c=0
                 for vo in v.l_vois:
                     if vo.c==-1:
+                        count=0
+                        for t in vo.l_vois:
+                            if t.c==0:
+                                count+=1
+
                         for vi in vo.l_vois:
                             if (vi.c==0) and (vi!=v) and not(vi in v.l_mv):
-                                vo.c=1
+                                if count==2:
+                                    vo.c=1
+                                else :
+                                    vo.c=3
                                 m=Mur(vo,v,vi)
                                 v.add_mur(m)
                                 v.add_mv(vi)
@@ -373,11 +382,33 @@ def coloriser(lv):
                                 vi.add_mv(v)
                                 break
 
+def generer_maze(lv):
+    lm=[]
+    case=choice(lv)
+    while(case.c!=0):
+        case=choice(lv)
+    case.visit=1
+    lm+=case.l_mur
+    while(lm!=[]):
+        mur=choice(lm)
+        if mur.v1.visit+mur.v2.visit==1:
+            mur.vm.c=0
+            if mur.v1.visit==0:
+                mur.v1.visit=1
+                lm+=mur.v1.l_mur
+            else:
+                mur.v2.visit=1
+                lm+=mur.v2.l_mur
+
+        lm.pop(lm.index(mur))
+                
+                
                 
 #genere une liste de voronoi prenant en paramÃƒÂ¨tre la taille et le nombre de point
-ListV=generate_voronoi(50000,200,30)
+ListV=generate_voronoi(50000,1000,30)
 coloriser(ListV)
 print(len(ListV))
+generer_maze(ListV)
 print("good")
 
 

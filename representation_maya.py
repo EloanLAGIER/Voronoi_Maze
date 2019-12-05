@@ -18,6 +18,11 @@ cmds.connectAttr('mur.outColor','murSG.surfaceShader')
 cmds.setAttr("mur.color",0,1,0)
 
 
+cmds.shadingNode('lambert',asShader=True,name="pb")
+cmds.sets(renderable=True,noSurfaceShader=True,empty=True,name="pbSG")
+cmds.connectAttr('pb.outColor','pbSG.surfaceShader')
+cmds.setAttr("pb.color",1,0,1) 
+
 for j in range(len(ListV)):
     l_points = ListV[j].l_points
     cmds.polyDisc(subdivisions=0,sides=len(l_points))
@@ -40,7 +45,9 @@ for j in range(len(ListV)):
     if ListV[j].c==2:
         cmds.select('V'+str(j))
         cmds.sets(e=True,fe="bordSG")
-
+    if ListV[j].c==3:
+        cmds.select('V'+str(j))
+        cmds.sets(e=True,fe="pbSG")
     cmds.xform(p=True)
     
 for i in range(len(ListV)):
