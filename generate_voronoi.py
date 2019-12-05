@@ -302,7 +302,9 @@ def voronoi(lp, lt):
             v3.add_vois(v1)
     for v in ListVor:
         if len(v.l_vois)!=v.nb_cote:
-            v.c=1
+            for v2 in v.l_vois:
+                v2.c= 1
+            ListVor.pop(ListVor.index(v))
     print(lpb)
     return ListVor
 
