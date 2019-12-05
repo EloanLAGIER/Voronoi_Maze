@@ -4,38 +4,65 @@ from copy import *
 import itertools
 #sdkfjsldjghskdj
 
-def random_point(distance,nb_points):
-    candidates = list(itertools.product(range(500), range(500)))
-    points = []
-    for i in range(nb_points):
+def distance(p1,p2,dist):
+    return sqrt(pow((p1[0]-p2[0]),2)+pow((p1[1]-p2[1]),2))<dist
+def random_point(taille,np,dist,l=[]):
+    print(np)
+    Li=l[::]
+    if np==0:
+        return True,l
+    
+    for i in range(3):
+        drap=True
+        x=randint(dist,taille-dist)
+        y=randint(dist,taille-dist)
+        print(len(l))
+        for p in range(len(Li)):
+            if distance(Li[p],[x,y],dist):
+                drap=False
+                continue
+        if drap==True:
+            Li.append([x,y])
+            b,L=random_point(taille,np-1,dist,Li)
+            if b==True:
+                return b,L
+            
+##def random_point(distance,nb_points,taille):
+##    candidates = list(itertools.product(range(taille), range(taille)))
+##    points = []
+##    for i in range(nb_points):
+##        print(str(i)+"/"+str(nb_points))
+##        if not len(candidates):
+##            break
+##        point = x, y = choice(candidates)
+##        points.append([point[0],point[1]])
+##
+##        candidates = [
+##            (xx, yy) 
+##            for xx, yy in candidates 
+##            if ((x - xx) ** 2 + (y - yy) ** 2) ** .5 > distance
+##        ]
+##    return points
 
-        if not len(candidates):
-            break
-        point = x, y = choice(candidates)
-        points.append([point[0],point[1]])
-
-        candidates = [
-            (xx, yy) 
-            for xx, yy in candidates 
-            if ((x - xx) ** 2 + (y - yy) ** 2) ** .5 > distance
-        ]
-    return points
-
-#fonction principale( taille = dimension du carrÃ© gÃ©nÃ©ral et n nombre de cellules de voronoi )
-def generate_voronoi(taille,n):
+#fonction principale( taille = dimension du carrÃƒÂ© gÃƒÂ©nÃƒÂ©ral et n nombre de cellules de voronoi )
+def generate_voronoi(taille,n,dist):
     
 
     
-    centieme=taille/100#calcul du centieme de la taille pour pas que yest des points pil sur les bords
 
-    #generation des points aleatoire (encore trÃ¨s simple )
-    ListPoint=random_point(30,100)
+
+    #generation des points aleatoire (encore trÃƒÂ¨s simple )
+    print("generation des points")
+    b,ListPoint=random_point(taille,n,dist)
+    print("done")
     #fonction renvoyant les triangles de la triangulation des points
+    print("generation triangulation")
     listTri=BowyerWatson(taille,ListPoint)
-
+    print("done")
     #fonction renvoyant les cellules de voronoi
+    print("génération voronoi")
     lVor=voronoi(ListPoint,listTri)
-
+    
     return lVor
 
 #fonction pas faite par moi calculant si deux lignes se croisent c'etait fait a la rache sur un forum on peut se l'aproprier
@@ -55,7 +82,58 @@ def line_intersection(line1, line2):
     y = det(d, ydiff) / div
     return [x, y]
 
+def box(seg):
+    x1=seg[0][0]
+    x2=seg[1][0]
+    y1=seg[0][1]
+    y2=seg[1][1]
+    if x1<x2:
+        xb1=x1
+        xb2=x2
+    else:
+        xb1=x2
+        xb2=x1
+    if y1<y2:
+        yb1=y1
+        yb2=y2
+    else:
+        yb1=y2
+        yb2=y1
+    return([xb1,yb1,xb2,yb2])
+    
+def bool_intersection(line1, line2):
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
 
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+       return True
+
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    b=box(line1)
+    if (b[0]<=x)and(x<=b[2])and(b[1]<=y)and(y<=b[3]):
+        return False
+    else: 
+        return True
+
+##def convex(V):
+##    L=V.l_points
+##    LSeg=[]
+##    for i in range(len(L)-1):
+##        LSeg.append([L[i],L[(i+1)%len(L)]])
+##    for i in range(len(LSeg)):
+##        for j in range(len(LSeg)):
+##            if i!=j:
+##                if not(bool_intersection(LSeg[i],LSeg[j])):
+##                    return False
+##    return True
+
+    
 #fonction faite par moi calculant la mediane mais du coup mdr c'est n'importequoi
 def mediane(p1,p2):
     x1=p1[0]
@@ -64,7 +142,7 @@ def mediane(p1,p2):
     y2=p2[1]
     div=y1-y2
 
-    #genre Ã§a c'est de la triche, euler se suicide
+    #genre ÃƒÂ§a c'est de la triche, euler se suicide
     if div==0:
         div=0.1
     mil=[(p1[0]+p2[0])/2,(p1[1]+p2[1])/2]
@@ -74,7 +152,7 @@ def mediane(p1,p2):
 #instancede l'objet triangle qui va beaucoup servir
 class Triangle :
 
-    #Ã§a c'est la fonction qui s'active quand on crÃ©er une instance
+    #ÃƒÂ§a c'est la fonction qui s'active quand on crÃƒÂ©er une instance
     def __init__(self,point1,point2,point3):
 
         #les trois points du triangle p1,p2,p3
@@ -116,7 +194,7 @@ class Triangle :
     def a_le_point(self,p):
         return self.p1==p or self.p2==p or self.p3==p
 
-    #fonction qui regarde si un triangle t a un cotÃ© commun
+    #fonction qui regarde si un triangle t a un cotÃƒÂ© commun
     def cote_commun(self,t):
         return (t.seg1==self.seg1)or(t.seg1==self.seg2)or(t.seg1==self.seg3)or(t.seg2==self.seg1)or(t.seg2==self.seg2)or(t.seg2==self.seg3)or(t.seg3==self.seg1)or(t.seg3==self.seg2)or(t.seg3==self.seg3)
 
@@ -125,7 +203,7 @@ class Triangle :
         return (t.p1==self.p1)or(t.p1==self.p2)or(t.p1==self.p3)or(t.p2==self.p1)or(t.p2==self.p3)or(t.p2==self.p3)or(t.p3==self.p1)or(t.p3==self.p2)or(t.seg3==self.p3)
 
 #en faite quand on compare les segments des fois c'est les meme mais dans l'autre sens alors le programme comprend pas
-#du coup j'ai crÃ©e une fonction qui tri toujours les sgmens dans le meme sens voila voila
+#du coup j'ai crÃƒÂ©e une fonction qui tri toujours les sgmens dans le meme sens voila voila
 def trier_edge(x1,y1,x2,y2):
     calc1=x1*500+y1
     calc2=x2*500+y2
@@ -152,12 +230,13 @@ class Vor :
 
 
          
-#fonction qui créé le voronoi sa complexité est de O^3 c'est affreux
+#fonction qui crÃ©Ã© le voronoi sa complexitÃ© est de O^3 c'est affreux
 def voronoi(lp, lt):
     ListVor=[]
     incr=0
     lpb=[]
     for p in lp:
+        print(str(lp.index(p))+"/"+str(len(lp)))
         incr+=1
         L=[]
 
@@ -197,10 +276,13 @@ def voronoi(lp, lt):
                     while (r==L.index(t_act)):
                         r=randint(0,len(L)-1)
                     t_suiv=L[r]
-        for i in range(len(LT)-1):
-            LT[i].voro_vois(V)
+        b=True
+        
+        if b:
+            for i in range(len(LT)-1):
+                LT[i].voro_vois(V)
 
-        ListVor.append(V)
+            ListVor.append(V)
 
     for t in lt:
         if len(t.listVorV)==2:
@@ -221,10 +303,11 @@ def voronoi(lp, lt):
     for v in ListVor:
         if len(v.l_vois)!=v.nb_cote:
             v.c=1
+    print(lpb)
     return ListVor
 
 
-#la triangulation a une complexitÃ© de O^2 mais askip on peut la faire en O*ln(0)
+#la triangulation a une complexitÃƒÂ© de O^2 mais askip on peut la faire en O*ln(0)
 #faut la nettoyer et cheker comment les cas particuliers possible
 def BowyerWatson(taille,lp):
     triangulation=[]
@@ -233,6 +316,7 @@ def BowyerWatson(taille,lp):
 
     triangulation.append(supT)
     for p in lp:
+        print(str(lp.index(p))+"/"+str(len(lp)))
         badTriangles=[]
         badTriangleEdge=[]
 
@@ -269,6 +353,7 @@ def BowyerWatson(taille,lp):
 
 def coloriser(lv):
     DicVor={}
+    nc=0
     for v in lv:
         DicVor[v] = v.l_vois
 
@@ -276,14 +361,15 @@ def coloriser(lv):
 
         if v.c==-1:
             v.c=0
+            nc+=1
             for vo in DicVor[v]:
                 vo.c=1
 
-
+    print(nc)
     return lv
-#genere une liste de voronoi prenant en paramÃ¨tre la taille et le nombre de point
-ListV=generate_voronoi(500,100)
-
+#genere une liste de voronoi prenant en paramÃƒÂ¨tre la taille et le nombre de point
+ListV=generate_voronoi(5000,500,30)
+coloriser(ListV)
 print(len(ListV))
 print("good")
 
