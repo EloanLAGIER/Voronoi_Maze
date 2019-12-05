@@ -1,8 +1,9 @@
 from random import *
 from math import *
 from copy import *
-import itertools
-#sdkfjsldjghskdj
+import sys
+sys.setrecursionlimit(50000)
+
 
 def distance(p1,p2,dist):
     return sqrt(pow((p1[0]-p2[0]),2)+pow((p1[1]-p2[1]),2))<dist
@@ -20,29 +21,14 @@ def random_point(taille,np,dist,l=[]):
         for p in range(len(Li)):
             if distance(Li[p],[x,y],dist):
                 drap=False
-                continue
+                break
         if drap==True:
             Li.append([x,y])
             b,L=random_point(taille,np-1,dist,Li)
             if b==True:
                 return b,L
             
-##def random_point(distance,nb_points,taille):
-##    candidates = list(itertools.product(range(taille), range(taille)))
-##    points = []
-##    for i in range(nb_points):
-##        print(str(i)+"/"+str(nb_points))
-##        if not len(candidates):
-##            break
-##        point = x, y = choice(candidates)
-##        points.append([point[0],point[1]])
-##
-##        candidates = [
-##            (xx, yy) 
-##            for xx, yy in candidates 
-##            if ((x - xx) ** 2 + (y - yy) ** 2) ** .5 > distance
-##        ]
-##    return points
+
 
 #fonction principale( taille = dimension du carrÃƒÂ© gÃƒÂ©nÃƒÂ©ral et n nombre de cellules de voronoi )
 def generate_voronoi(taille,n,dist):
@@ -219,14 +205,18 @@ class Vor :
         self.nb_cote=nb_cote
         self.c=-1
         self.l_points=[]
-        self.l_cote=[]
+        self.l_mur=[]
         self.l_vois=[]
-
+        self.l_mv=[]
     def add_vert(self,c):
         self.l_points.append(c)
     def add_vois(self,v):
         if not(v in self.l_vois):
             self.l_vois.append(v)
+    def add_mur(self,v):
+        self.l_mur.append(v)
+    def add_mv(self,v):
+        self.l_mv.append(v)
 
 
          
@@ -303,7 +293,7 @@ def voronoi(lp, lt):
     for v in ListVor:
         if len(v.l_vois)!=v.nb_cote:
             for v2 in v.l_vois:
-                v2.c= 1
+                v2.c= 2
             ListVor.pop(ListVor.index(v))
     print(lpb)
     return ListVor
@@ -352,27 +342,43 @@ def BowyerWatson(taille,lp):
 
     return triangulation
 
+class Mur:
+    def __init__(self,vm,v1,v2):
+        self.vm=vm
+        self.v1=v1
+        self.v2=v2
+
 
 def coloriser(lv):
-    DicVor={}
-    nc=0
-    for v in lv:
-        DicVor[v] = v.l_vois
 
-    for v in DicVor.keys():
+    for v in lv:
 
         if v.c==-1:
-            v.c=0
-            nc+=1
-            for vo in DicVor[v]:
-                vo.c=1
+            drap=True
+            for vo in v.l_vois:
+                if vo.c==0:
+                    drap=False
+                    break
+            if drap==True:
+                v.c=0
+                for vo in v.l_vois:
+                    if vo.c==-1:
+                        for vi in vo.l_vois:
+                            if (vi.c==0) and (vi!=v) and not(vi in v.l_mv):
+                                vo.c=1
+                                m=Mur(vo,v,vi)
+                                v.add_mur(m)
+                                v.add_mv(vi)
+                                vi.add_mur(m)
+                                vi.add_mv(v)
+                                break
 
-    print(nc)
-    return lv
+                
 #genere une liste de voronoi prenant en paramÃƒÂ¨tre la taille et le nombre de point
-ListV=generate_voronoi(5000,500,30)
+ListV=generate_voronoi(50000,200,30)
 coloriser(ListV)
 print(len(ListV))
 print("good")
+
 
 
