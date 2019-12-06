@@ -4,7 +4,8 @@ from copy import *
 import sys
 sys.setrecursionlimit(50000)
 
-
+def dist(p1,p2):
+    return sqrt(pow((p1[0]-p2[0]),2)+pow((p1[1]-p2[1]),2))
 def distance(p1,p2,dist):
     return sqrt(pow((p1[0]-p2[0]),2)+pow((p1[1]-p2[1]),2))<dist
 def random_point(taille,np,dist,l=[]):
@@ -209,6 +210,13 @@ class Vor :
         self.l_vois=[]
         self.l_mv=[]
         self.visit=0
+    def dist_max(self):
+        m=0
+        for i in range(len(self.l_points)-1):
+            d=dist(self.l_points[i],self.l_points[i%len(self.l_points)])
+            if d>m:
+                m=d
+        return m
     def add_vert(self,c):
         self.l_points.append(c)
     def add_vois(self,v):
@@ -349,11 +357,12 @@ class Mur:
         self.v1=v1
         self.v2=v2
 
-
-def coloriser(lv):
-
+def coloriser(lv,t):
+    dist=t*2.0
     for v in lv:
-
+        if (v.dist_max())>dist:
+            v.c=2
+            continue
         if v.c==-1:
             drap=True
             for vo in v.l_vois:
@@ -406,9 +415,9 @@ def generer_maze(lv):
                 
 #genere une liste de voronoi prenant en paramÃƒÂ¨tre la taille et le nombre de point
 ListV=generate_voronoi(50000,1000,30)
-coloriser(ListV)
+coloriser(ListV,30)
 print(len(ListV))
-generer_maze(ListV)
+
 print("good")
 
 
