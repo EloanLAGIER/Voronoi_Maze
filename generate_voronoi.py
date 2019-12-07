@@ -4,8 +4,7 @@ from copy import *
 import sys
 sys.setrecursionlimit(50000)
 
-def dist(p1,p2):
-    return sqrt(pow((p1[0]-p2[0]),2)+pow((p1[1]-p2[1]),2))
+
 def distance(p1,p2,dist):
     return sqrt(pow((p1[0]-p2[0]),2)+pow((p1[1]-p2[1]),2))<dist
 def random_point(taille,np,dist,l=[]):
@@ -209,14 +208,6 @@ class Vor :
         self.l_mur=[]
         self.l_vois=[]
         self.l_mv=[]
-        self.visit=0
-    def dist_max(self):
-        m=0
-        for i in range(len(self.l_points)-1):
-            d=dist(self.l_points[i],self.l_points[i%len(self.l_points)])
-            if d>m:
-                m=d
-        return m
     def add_vert(self,c):
         self.l_points.append(c)
     def add_vois(self,v):
@@ -357,12 +348,11 @@ class Mur:
         self.v1=v1
         self.v2=v2
 
-def coloriser(lv,t):
-    dist=t*2.0
+
+def coloriser(lv):
+
     for v in lv:
-        if (v.dist_max())>dist:
-            v.c=2
-            continue
+
         if v.c==-1:
             drap=True
             for vo in v.l_vois:
@@ -373,17 +363,9 @@ def coloriser(lv,t):
                 v.c=0
                 for vo in v.l_vois:
                     if vo.c==-1:
-                        count=0
-                        for t in vo.l_vois:
-                            if t.c==0:
-                                count+=1
-
                         for vi in vo.l_vois:
                             if (vi.c==0) and (vi!=v) and not(vi in v.l_mv):
-                                if count==2:
-                                    vo.c=1
-                                else :
-                                    vo.c=3
+                                vo.c=1
                                 m=Mur(vo,v,vi)
                                 v.add_mur(m)
                                 v.add_mv(vi)
@@ -391,34 +373,9 @@ def coloriser(lv,t):
                                 vi.add_mv(v)
                                 break
 
-def generer_maze(lv):
-    lm=[]
-    case=choice(lv)
-    while(case.c!=0):
-        case=choice(lv)
-    case.visit=1
-    lm+=case.l_mur
-    while(lm!=[]):
-        mur=choice(lm)
-        if mur.v1.visit+mur.v2.visit==1:
-            mur.vm.c=0
-            if mur.v1.visit==0:
-                mur.v1.visit=1
-                lm+=mur.v1.l_mur
-            else:
-                mur.v2.visit=1
-                lm+=mur.v2.l_mur
-
-        lm.pop(lm.index(mur))
-                
-                
                 
 #genere une liste de voronoi prenant en paramÃƒÂ¨tre la taille et le nombre de point
-ListV=generate_voronoi(50000,1000,30)
-coloriser(ListV,30)
+ListV=generate_voronoi(50000,200,30)
+coloriser(ListV)
 print(len(ListV))
-
 print("good")
-
-
-
