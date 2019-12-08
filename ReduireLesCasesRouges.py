@@ -92,7 +92,11 @@ for i in range(len(ListV)):
 cmds.select(all=True)
 cmds.polyUnite(n='MazeComb')
 
+#il faut unir les objets pour que ca marche
+
 cmds.delete(ch = True)
+
+#supprime l'history
 
 list = cmds.ls(sl=True)
 for item in list:
@@ -103,12 +107,15 @@ for item in list:
 cmds.polyMergeVertex( d=0.00001 )
 cmds.select(cl=True)
 
+#merge tt les vertex pour que le scale etire les autres cellules
 
-materialName = 'sol'
+materialName = 'sol'#nom du matos dans l'hypershade
 shadingGroup = cmds.listConnections(materialName, type='shadingEngine')
 print(shadingGroup)
 componentsWithMaterial = cmds.sets(shadingGroup, q=True)
 print(componentsWithMaterial)
+
+#cree une liste de tts les faces avec le matos
 
 
 
@@ -120,6 +127,8 @@ for i in range(0,len(componentsWithMaterial)):
     #print(MySelPos)
     #cmds.move(0.5,1,0.6)
     cmds.scale(0.1,0.1,0.1,r=True,componentSpace=True)
+    
+    ##rescale des faces par componenetr, c a d par arapport a la eurs propre centre de pivot
     
 #for i in range(1,len(componentsWithMaterial)-1,2):
     #Sel = cmds.select(componentsWithMaterial[i],add=True)
@@ -155,13 +164,17 @@ for i in range(0,len(componentsWithMaterial)):
     FaceSel = cmds.polyChipOff(dup=False)
     #cmds.move(0,1,0)
     
+    #resepare les faces 
+    
     #cmds.rename('Cel'+str(i+1))
     
 
 cmds.select(all=True)
 cmds.polySeparate()
 
-cmds.delete(ch = True)
+    #cree des objets pour chaque face
+
+'''cmds.delete(ch = True)
 
 materialName = 'sol'
 shadingGroup = cmds.listConnections(materialName, type='shadingEngine')
@@ -173,7 +186,7 @@ print(componentsWithMaterial)
 
 for i in range(0,len(componentsWithMaterial)):
     Sel = cmds.select(componentsWithMaterial[i])
-    cmds.rename('Cel'+str(i+1))
+    cmds.rename('Cel'+str(i+1))'''
     
   
 
