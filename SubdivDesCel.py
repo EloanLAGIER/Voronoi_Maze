@@ -4,14 +4,11 @@ for c in g.dicCel.values():
     
     cmds.select('C'+str(c.index))
     if c.c==0:
-        cmds.sets(e=True,fe="solSG")
         cmds.rename("Sol"+str(c.index))
     if c.c==1:
-        cmds.sets(e=True,fe="murSG")
         cmds.rename("Mur"+str(c.index))
 
     if c.c==2:
-        cmds.sets(e=True,fe="murSG")
         cmds.rename("Mur"+str(c.index))
 
     cmds.move(-25,0,-25)
