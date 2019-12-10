@@ -11,8 +11,6 @@ for c in g.dicCel.values():
     if c.c==2:
         cmds.rename("Mur"+str(c.index))
 
-    cmds.move(-25,0,-25)
-    cmds.xform(s=[0.1,1,0.1],p=True,cp=True)
     
 
 
